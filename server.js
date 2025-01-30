@@ -1,21 +1,81 @@
-const express=require('express');
-const authRoute=require('./src/routers/authRoutes.js');
-const dotenv=require('dotenv');
-const cors=require('cors');
-const {PrismaClient}=require('@prisma/client');
+const express=require('express')
+const jwt=require('jsonwebtoken')
+const cors=require('cors')
+const admin=require('./firebaseAdmin')
+const prismaclient=require('@prisma/client')
+
+const app=express()
+const prisma=new prismaclient.PrismaClient()
 
 
-dotenv.config();
+app.use(cors())
+app.use(express.json())
 
-const prisma = new PrismaClient();
-const app=express();
+const JWT_SECRET=process.env.JWT_SECRET
 
-app.use(cors());
-app.use(express.json());
+app.post('/signin',async(req,res)=>{
+    try{
+        const {token}=req.body;
+        const decodedToken=await admin.auth().verifyIdToken(token)
+        const {email,name,picture}=decodedToken
+
+        let user=await prisma.user.findUnique({
+            where:{
+                email
+            }
+        })
+
+        if(!user){
+            user=await prisma.user.create({
+                data:{
+                    email,
+                    name,
+                    picture,
+                   
+                   
+                }
+            })
+        }
+
+        const jwtToken=jwt.sign({id:user.id,email},JWT_SECRET,{expiresIn:'1d'})
+        res.json({token:jwtToken,user})
+    }catch(error){
+        console.error(error)
+        res.status(401).json({error:'Invalid token'})
+    }
+})
+
+//Protected route example
+
+app.get('/home',async(req,res)=>{
+    try{
+        const authHeader=req.header.authorization
+        if(!authHeader){
+            return res.status(401).json({error:'Invalid token'})
+        }
+
+        const token=authHeader.split(" ")[1];
+        const decoded=jwt.verify(token,JWT_SECRET)
+        
+        const user=await prisma.user.findUnique({
+            where:{
+                id:decoded.id
+            }
+        })
+        if(!user){
+            return res.status(401).json({error:'user not found'})
+        }
+        res.json({"message":"welcome",user})
+    }catch(error){
+        console.log(error)
+        res.status(401).json({error:'Invalid token'})
+    }
+})
 
 
-app.use('/lamma-cloud',authRoute)
-const PORT=process.env.PORT || 5000;
-app.listen(PORT,()=>{
-    console.log(`server lisening at: http://localhost:${process.env.PORT}`);
-});
+
+//  parsing goes here
+
+app.listen(5000,()=>{
+    console.log('Server running on port 5000')
+})

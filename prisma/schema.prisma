@@ -9,11 +9,10 @@ generator client {
 model User {
   id          String @id @default(uuid())
   email       String @unique
-  displayName String
-  provider    String
-  providerId  String @unique
+  name        String
+  picture     String
   createdAt   DateTime @default(now())
-Organizations Organization[] //a user have many organization
+  Organizations Organization[] //a user have many organization
 }
 model File_Information {
   file_id        String @id @default(uuid())
