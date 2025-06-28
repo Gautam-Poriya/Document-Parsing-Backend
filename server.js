@@ -491,6 +491,8 @@ app.post("/parse-pdf", upload.single("file"), async (req, res) => {
   }
 });
 
+
+
 app.post("/api/organizations", async (req, res) => {
   const { token, organizationName } = req.body;
   console.log("Received Token:", token); // Log token for debugging
