@@ -1,3 +1,16 @@
+# Dependencies
 node_modules
-prisma
+
+# Environment files
 .env
+prisma
+
+# Build outputs
+dist/
+build/
+.cache/
+.next/
+out/
+
+# System files
+.DS_Store
