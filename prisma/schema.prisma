@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  picture       String
+  createdAt     DateTime       @default(now())
+  Organizations Organization[] //a user have many organization
+
+  FileInformation FileInformation[]
+}
+
+model FileInformation {
+  file_id   Int      @id @default(autoincrement())
+  uuid      String   @unique
+  jobId     String
+  file_Name String
+  createdAt DateTime @default(now())
+  parseMode String
+  parsedAt  DateTime @default(now())
+  markDown  String?
+  text      String?
+  json      String?
+  images    String?
+  layout    String?
+  xlsx      String?
+
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [Organization_Id])
+}
+
+model Organization {
+  Organization_Id   String            @id @default(uuid())
+  Organization_Name String            @unique 
+  userId            String
+  user              User              @relation(fields: [userId], references: [id])
+  CreatedAt         DateTime          @default(now())
+  FileInformation   FileInformation[] // Ensure relationship exists
+  projects          Project[] //One to many relationship with project
+}
+
+model Project {
+  Porject_Name String
+  Project_Id   String   @id @default(uuid())
+  CreatedAt    DateTime @default(now()) // Fixed @db.Date (not needed in Prisma)
+
+  Organization_Id String //foreign key referencing organization id
+  organization    Organization @relation(fields: [Organization_Id], references: [Organization_Id]) //relationship to organization
+}
+
+model Sign_Up_For_WaitList {
+  Full_Name             String
+  email                 String  @unique
+  Text_Document_And_Pdf Boolean
+  Csvs_And_Excel        Boolean
+  Images                Boolean
+  Others                String
+  Company_Size          Int
+  Title                 String
+  LinkedIn_Url          String
+  Saas                  Boolean
+  Onprimise_Deployment  Boolean
+}

@@ -3,7 +3,7 @@ node_modules
 
 # Environment files
 .env
-prisma
+.prisma/client/
 serviceAccountKey.json
 # Build outputs
 dist/
