@@ -203,8 +203,37 @@ exports.parsePdf = async (req, res) => {
           { headers }
         );
         console.log("json respponse is:", jsonResponse.data);
+         const organizationId = await prisma.organization.findFirst({
+          where: { Organization_Name: organization },
+        });
+        const fileInfo = await prisma.fileInformation.create({
+          data: {
+            uuid: crypto.randomUUID(), // Generate a unique UUID
+            jobId: jobId, // Store Job ID
+            file_Name: fileName, // File name from parameter
+            parseMode: parseMode, // Parse mode (e.g., "Fast", "Accurate")
+            markDown: null,
+            text: JSON.stringify(textResponse.data) ?? null,
+            json: JSON.stringify(jsonResponse.data) ?? null,
+            images: null,
+            layout: null,
+            xlsx: null,
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+            organization: {
+              connect: {
+                Organization_Id: organizationId.Organization_Id,
+              },
+            },
+          },
+        });
+        console.log("✅ File information stored successfully:", fileInfo);
         // Organize all responses
         const result = {
+          // markdown: markdownResponse.data,
           text: textResponse.data,
           json: jsonResponse.data,
           job_id: jobId,
@@ -271,6 +300,34 @@ exports.parsePdf = async (req, res) => {
           { headers }
         );
         console.log("xlsx respponse is:", xlsxResponse.data);
+         const organizationId = await prisma.organization.findFirst({
+          where: { Organization_Name: organization },
+        });
+        const fileInfo = await prisma.fileInformation.create({
+          data: {
+            uuid: crypto.randomUUID(), // Generate a unique UUID
+            jobId: jobId, // Store Job ID
+            file_Name: fileName, // File name from parameter
+            parseMode: parseMode, // Parse mode (e.g., "Fast", "Accurate")
+            markDown: JSON.stringify(markdownResponse.data) ?? null,
+            text: JSON.stringify(textResponse.data) ?? null,
+            json: JSON.stringify(jsonResponse.data) ?? null,
+            images: null,
+            layout: null,
+            xlsx: null,
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+            organization: {
+              connect: {
+                Organization_Id: organizationId.Organization_Id,
+              },
+            },
+          },
+        });
+        console.log("✅ File information stored successfully:", fileInfo);
         // Organize all responses
         const result = {
           markdown: markdownResponse.data,
