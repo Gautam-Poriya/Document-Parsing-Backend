@@ -14,6 +14,6 @@ app.use("/", require("./routes/organizationRoutes"));
 app.use("/", require("./routes/fileRoutes"));
 app.use("/", require("./routes/historyRoutes"));
 
-app.listen(5000, () => {
+app.listen(process.env.PORT||3000, () => {
   console.log("Server running on port 5000");
 });
